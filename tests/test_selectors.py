@@ -28,7 +28,7 @@ def test_feature_selector_discards_noise():
     best_features = fs.run(
         eval_func=get_mae_from_cv_time_series,
         df=df,
-        model=LGBMRegressor(),
+        model_ref=LGBMRegressor,
         feature_list=[i for i in df.columns if i != 'label']
     )
 
@@ -54,7 +54,7 @@ def test_feature_selector_selects_improving_signal():
     best_features = fs.run(
         eval_func=get_mae_from_cv_time_series,
         df=df,
-        model=LGBMRegressor(),
+        model_ref=LGBMRegressor,
         feature_list=[i for i in df.columns if i != 'label']
     )
 
@@ -90,7 +90,7 @@ def test_train_selector_drops_very_noisy_start():
     best_train_start = tss.run(
         eval_func=get_mae_from_cv_time_series,
         df=df,
-        model=LGBMRegressor(),
+        model_ref=LGBMRegressor,
         cv_start=cv_start
     )
 

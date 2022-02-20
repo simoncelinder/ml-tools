@@ -1,3 +1,8 @@
+from ml_tools.feature_selector import FeatureSelector
+from ml_tools.train_start_selector import TrainStartSelector
+from ml_tools.tuner import Tuner
+
+
 class ModelAssumptionSelector:
 
     """ Select of best assumptions for an ML model. Idea is to have an interface that is agnostic to
@@ -35,10 +40,13 @@ class ModelAssumptionSelector:
 
     def __init__(
             self,
-            selectors: tuple  # E.g: (TrainStartSelector(...), FeatureSelector(...), Tuner(...))
+            selectors: tuple,  # E.g: (TrainStartSelector(...), FeatureSelector(...), Tuner(...))
+            verbosity: int = 1,
     ):
 
         self.selectors = selectors
+        self.verbosity = verbosity
+
 
     def run(
             self,
@@ -48,8 +56,34 @@ class ModelAssumptionSelector:
 
         best_assumptions = {}
         for selector in self.selectors:
-            best_assumptions[selector.__class__.__name__] = (
-                selector.run(eval_func, **kwargs)
-            )
+
+            search_result = selector.run(eval_func, **kwargs)
+            best_assumptions[selector.__class__.__name__] = search_result
+
+            if isinstance(selector, TrainStartSelector):
+                self.update_data_start(kwargs, search_result)
+
+            # Might want to check why these 2 required .__name__
+            # matching and isinstance didn't match
+            elif selector.__class__.__name__ == FeatureSelector.__name__:
+                self.update_feature_list(kwargs, search_result)
+
+            elif selector.__class__.__name__ == Tuner.__name__:
+                self.update_hypers(kwargs, search_result)
 
         return best_assumptions
+
+    def update_data_start(self, kwargs, search_result):
+        kwargs['df'] = kwargs['df'].loc[kwargs['df'].index >= search_result]
+        if self.verbosity >= 1:
+            print(f"Updated df to selected train start: {search_result}")
+
+    def update_feature_list(self, kwargs, search_result):
+        kwargs['feature_list'] = search_result
+        if self.verbosity >= 1:
+            print(f"Updated feature_list to selected: {search_result}")
+
+    def update_hypers(self, kwargs, search_result):
+        kwargs['hypers'] = search_result
+        if self.verbosity >= 1:
+            print(f"Updated hyperparameters to selected: {search_result}")

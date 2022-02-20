@@ -4,7 +4,6 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 
-@dataclass
 class FeatureSelector:
 
     """ This class is used to run a feature selection heuristic on a holdout set or with cross-validation. If the
@@ -19,14 +18,23 @@ class FeatureSelector:
     improve vs not improve the score and return the best feature list by setting infinite patience to search
     through all of them. """
 
-    direction: str = 'minimize'  # Whether to maximize or minimize the metric
-    strategy: str = 'adding'  # Whether to recursively add or remove features
-    search_depth: int = 4  # How many features to test adding/removing one at a time during each loop
-    patience: int = 2  # How many iterations to run without improvement without the search stopping
-    add_feature_threshold: float = 0.0001  # When adding features, require small improvement in score
+    def __init__(
+            self,
+            direction: str = 'minimize',  # Whether to maximize or minimize the metric
+            strategy: str = 'adding',  # Whether to recursively add or remove features
+            search_depth: int = 4,  # How many features to test adding/removing one at a time during each loop
+            patience: int = 2,  # How many iterations to run without improvement without the search stopping
+            add_feature_threshold: float = 0.0001,  # When adding features, require small improvement in score
+            verbosity: float = 1,
+    ):
 
-    verbosity: float = 1
-    result_df: pd.DataFrame = None
+        self.direction = direction
+        self.strategy = strategy
+        self.search_depth = search_depth
+        self.patience = patience
+        self.add_feature_threshold = add_feature_threshold
+        self.verbosity = verbosity
+        self.result_df = None
 
     def run(
             self,
@@ -92,9 +100,9 @@ class FeatureSelector:
                                   'score': best_score})
 
         # Print out final result of search
-        if self.verbosity >= 0.5:
-            print('\n', f"FeatureSelector - Final best score: {round(global_best_score, 3)} "
-                        f"with features: {best_feature_list}")
+        if self.verbosity >= 1:
+            print(f"FeatureSelector - Final best score: {round(global_best_score, 3)} "
+                  f"with features: {best_feature_list}")
 
         # Summarize result in dataframe as attribute
         self.result_df = pd.DataFrame(list_of_dicts).set_index('num_features')
@@ -161,10 +169,10 @@ class FeatureSelector:
             best_feature_list = feature_combination_list
             global_improvement = True
 
-            if global_improvement and self.verbosity >= 1:
-                print('\n', f"* * Global loss improved: {round(current_score, 5)} with {len(feature_combination_list)} "
+            if global_improvement and self.verbosity >= 2:
+                print('\n', f"Global loss improved: {round(current_score, 5)} with {len(feature_combination_list)} "
                             f"features, feature_list = {feature_combination_list} "
-                      f"{self.strategy} feature {feature} * *")
+                      f"{self.strategy} feature {feature}")
 
         return best_feature_list, global_best_score, global_improvement
 
