@@ -14,25 +14,31 @@ class ModelAssumptionSelector:
     Example call:
 
     mas = ModelAssumptionSelector(
+
         selectors = (
 
+            # 1) Select train start
             TrainStartSelector(
                 eval_window_rows = len(df[cv_start:]),
                 min_train_rows= 7*4,
-                n_trials=10
+                n_trials=20
             ),
 
+            # 2) Select best features
             FeatureSelector(),
 
-            Tuner(params_grid={'dummy': 1})  # TODO
-
+            # 3) Select best hyperparameters
+            Tuner(
+                lazy_optuna_space=partial(get_lazy_space),
+                n_trials=50
+            )
         )
     )
 
     best_assumptions = mas.run(
         eval_func=get_mae_from_cv_time_series,
         df=df,
-        model=lgb.LGBMRegressor(),  # TODO pass by reference for tuning, model = model_ref(**params)
+        model_ref=lgb.LGBMRegressor,
         feature_list=[i for i in df.columns if i != 'label']
     )
 
