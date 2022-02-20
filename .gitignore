@@ -127,3 +127,9 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# Local notebooks
+/ml_tools/local_notebooks/
+
+# Other environment stuff
+.idea/
