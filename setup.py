@@ -22,6 +22,7 @@ setup(
         "matplotlib==3.5.1",
         "plotly==5.4.0",
         "chart-studio==1.1.0",
+        "optuna==2.10.0"
     ],
     extras_require={
         'test': [

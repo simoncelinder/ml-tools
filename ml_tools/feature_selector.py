@@ -28,7 +28,7 @@ class FeatureSelector:
     verbosity: float = 1
     result_df: pd.DataFrame = None
 
-    def get_best_feature_list(
+    def run(
             self,
             eval_func,  # Should get a score to minimize or maximize, e.g. from cross-validation
             **kwargs,  # Set all arguments to eval_func when falling
