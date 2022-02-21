@@ -1,6 +1,6 @@
 import optuna
 from ml_tools.selector_base_classes import TunerBase
-from typing import List, Tuple
+from typing import List
 
 
 class Tuner(TunerBase):
@@ -15,7 +15,7 @@ class Tuner(TunerBase):
 
     def __init__(
             self,
-            lazy_optuna_space: List[Tuple, ...],
+            lazy_optuna_space: List,
             direction: str = 'minimize',
             n_trials: int = 40,
             verbosity: int = 1
