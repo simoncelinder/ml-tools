@@ -1,10 +1,10 @@
-from dataclasses import dataclass
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+from ml_tools.selector_base_classes import FeatureSelectorBase
 
 
-class FeatureSelector:
+class FeatureSelector(FeatureSelectorBase):
 
     """ This class is used to run a feature selection heuristic on a holdout set or with cross-validation. If the
     user has ranked the feature_list so features assumed to have higher explanatory power are earlier in the list,
@@ -26,6 +26,7 @@ class FeatureSelector:
             patience: int = 2,  # How many iterations to run without improvement without the search stopping
             add_feature_threshold: float = 0.0001,  # When adding features, require small improvement in score
             verbosity: float = 1,
+            remind_sorting: bool = True,
     ):
 
         self.direction = direction
@@ -34,6 +35,7 @@ class FeatureSelector:
         self.patience = patience
         self.add_feature_threshold = add_feature_threshold
         self.verbosity = verbosity
+        self.remind_sorting = remind_sorting
         self.result_df = None
 
     def run(
@@ -41,6 +43,9 @@ class FeatureSelector:
             eval_func,  # Should get a score to minimize or maximize, e.g. from cross-validation
             **kwargs,  # Set all arguments to eval_func when falling
     ):
+        if self.remind_sorting:
+            self.print_sorting_reminder()
+
         self.assert_consistency(eval_func, kwargs)
         list_of_dicts = []
 
@@ -109,6 +114,11 @@ class FeatureSelector:
         self.result_df = self.result_df.sort_index(ascending=True)
 
         return best_feature_list
+
+    def print_sorting_reminder(self):
+        print("For FeatureSelector, note that the feature_list int kwargs needs to be sorted from high "
+              "presumed importance to low, for the search to work properly (unless search_depth >= "
+              "len(feature_list) so all combinations are covered anyway).")
 
     def assert_consistency(self, eval_func, kwargs):
         # Interface requirement: eval_func must take feature_list as an argument for loop to work,

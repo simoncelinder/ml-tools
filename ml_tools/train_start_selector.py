@@ -1,8 +1,9 @@
 import optuna
+from ml_tools.selector_base_classes import TrainStartSelectorBase
 optuna.logging.set_verbosity(optuna.logging.WARNING)
 
 
-class TrainStartSelector:
+class TrainStartSelector(TrainStartSelectorBase):
 
     """ To select where good signal starts in the data, since old data might not be so relevant any more.
     This can be relevand not only for time series forecasting and regression, but also classification cases
