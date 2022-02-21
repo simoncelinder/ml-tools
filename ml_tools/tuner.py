@@ -1,13 +1,20 @@
 import optuna
-import functools
 from ml_tools.selector_base_classes import TunerBase
-
+from typing import List, Tuple
 
 class Tuner(TunerBase):
 
+    """ Wrapper for piping hyperparameters tuning into the flow.
+    The types expected for lazy_optuna_space (since it depends on the trial) are like:
+    lazy_optuna_space = [
+        ('learning_rate', 'trial.suggest_float', 0.03, 0.3),
+        ('n_estimators', 'trial.suggest_int', 10, 200)
+    ]
+    """
+
     def __init__(
             self,
-            lazy_optuna_space: functools.partial,  # e.g. partial({'learnin_rate': trial.suggest_ ..., ...})
+            lazy_optuna_space: List[Tuple, ...],
             direction: str = 'minimize',
             n_trials: int = 40,
             verbosity: int = 1
