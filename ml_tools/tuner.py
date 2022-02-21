@@ -2,6 +2,7 @@ import optuna
 from ml_tools.selector_base_classes import TunerBase
 from typing import List, Tuple
 
+
 class Tuner(TunerBase):
 
     """ Wrapper for piping hyperparameters tuning into the flow.
